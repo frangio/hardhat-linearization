@@ -1,5 +1,5 @@
 import { task } from 'hardhat/config';
-import { parseFullyQualifiedName } from 'hardhat/utils/contract-names';
+import { getFullyQualifiedName } from 'hardhat/utils/contract-names';
 import { TASK_COMPILE } from 'hardhat/builtin-tasks/task-names';
 import { astDereferencer, findAll } from 'solidity-ast/utils';
 
@@ -10,11 +10,12 @@ task("print-linearization")
     if (!args.noCompile) {
       await hre.run(TASK_COMPILE, { quiet: true });
     }
-    const buildInfo = await hre.artifacts.getBuildInfo(args.contract);
+    const { sourceName, contractName } = await hre.artifacts.readArtifact(args.contract);
+    const fullName = getFullyQualifiedName(sourceName, contractName);
+    const buildInfo = await hre.artifacts.getBuildInfo(fullName);
     if (buildInfo === undefined) {
       throw new Error('Build info not found');
     }
-    const { sourceName, contractName } = parseFullyQualifiedName(args.contract);
     const deref = astDereferencer(buildInfo.output);
     for (const c of findAll('ContractDefinition', buildInfo.output.sources[sourceName]!.ast)) {
       if (c.name === contractName) {
