@@ -1,20 +1,21 @@
 import { task } from 'hardhat/config';
-import { parseFullyQualifiedName } from 'hardhat/utils/contract-names';
+import { getFullyQualifiedName } from 'hardhat/utils/contract-names';
 import { TASK_COMPILE } from 'hardhat/builtin-tasks/task-names';
 import { astDereferencer, findAll } from 'solidity-ast/utils';
 
 task("print-linearization")
-  .addPositionalParam("contract", "The fully qualified contract name (contracts/File.sol:ContractName)")
+  .addPositionalParam("contract", "The contract name (If ambiguous, use the fully qualified name in the form contracts/File.sol:ContractName)")
   .addFlag("noCompile", "Skip compilation")
   .setAction(async (args: { contract: string, noCompile: boolean }, hre, runSuper) => {
     if (!args.noCompile) {
       await hre.run(TASK_COMPILE, { quiet: true });
     }
-    const buildInfo = await hre.artifacts.getBuildInfo(args.contract);
+    const { sourceName, contractName } = await hre.artifacts.readArtifact(args.contract);
+    const fullName = getFullyQualifiedName(sourceName, contractName);
+    const buildInfo = await hre.artifacts.getBuildInfo(fullName);
     if (buildInfo === undefined) {
       throw new Error('Build info not found');
     }
-    const { sourceName, contractName } = parseFullyQualifiedName(args.contract);
     const deref = astDereferencer(buildInfo.output);
     for (const c of findAll('ContractDefinition', buildInfo.output.sources[sourceName]!.ast)) {
       if (c.name === contractName) {
