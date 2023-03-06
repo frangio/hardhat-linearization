@@ -4,7 +4,7 @@ import { TASK_COMPILE } from 'hardhat/builtin-tasks/task-names';
 import { astDereferencer, findAll } from 'solidity-ast/utils';
 
 task("print-linearization")
-  .addPositionalParam("contract", "The contract name (If ambiguous, use the fully qualified name in the form contracts/File.sol:ContractName)")
+  .addPositionalParam("contract", "The contract name or fully qualified name (contracts/File.sol:ContractName)")
   .addFlag("noCompile", "Skip compilation")
   .setAction(async (args: { contract: string, noCompile: boolean }, hre, runSuper) => {
     if (!args.noCompile) {
