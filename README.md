@@ -1,6 +1,9 @@
+> [!TIP]
+> For Hardhat 3 see [@solidstate/hardhat-linearization](https://github.com/solidstate-network/hardhat-linearization).
+
 # hardhat-linearization
 
-This Hardhat plugins adds a `print-linearization` task that prints the linearization of a contract.
+This Hardhat 2 plugins adds a `print-linearization` task that prints the linearization of a contract.
 
 ```bash
 # use just the contract name if it's unique
